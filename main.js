@@ -1,8 +1,13 @@
+const fs = require("fs");
+const path = require("path")
 const request = require("request");
 const cheerio = require("cheerio");
 const AllMatchObj = require("./AllMatch");
 const url =
   "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038";
+
+const iplpath = path.join(__dirname, "IPL FOLDER")
+dirMaker(iplpath);
 
 request(url, cb);
 
@@ -20,4 +25,10 @@ function extractlink(html) {
   let fullLink = "https://www.espncricinfo.com" + link;
   AllMatchObj.gAllMatches(fullLink);
   // console.log(fullLink);
+}
+
+function dirMaker(filepath) {
+  if (fs.existsSync(filepath) == false) {
+    fs.mkdirSync(filepath);
+  }
 }
