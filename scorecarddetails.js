@@ -4,7 +4,7 @@ const path = require("path");
 const fs = require("fs")
 const xlsx = require("xlsx");
 
-const url = "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs-chennai-super-kings-final-1370353/full-scorecard";
+// const url = "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs-chennai-super-kings-final-1370353/full-scorecard";
 
 
 function processURL(url) {
@@ -20,6 +20,11 @@ function cb(err, res, html) {
 }
 
 function extractMatchDetails(html) {
+  // ipl 
+    // team 
+    //     player 
+    //         runs balls fours sixes sr opponent venue date  result
+    // venue date 
   let $ = cheerio.load(html);
   let descelem = $(
     ".ds-grow .ds-text-tight-m.ds-font-regular.ds-text-typo-mid3"
@@ -62,7 +67,7 @@ function extractMatchDetails(html) {
         console.log(
           `${PlayerName} made runs ${runs}, ${balls}  in balls with ${fours} fours and ${sixes} sixes with strike-rate of ${strike_rate}`
         );
-        // processplayer(TeamName, PlayerName, runs, balls, fours, sixes, strike_rate, OpponentName, Venue, Date, result)
+        processplayer(TeamName, PlayerName, runs, balls, fours, sixes, strike_rate, OpponentName, Venue, Date, result)
       }
     }
   }
