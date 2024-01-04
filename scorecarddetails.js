@@ -1,8 +1,11 @@
 const request = require("request");
 const cheerio = require("cheerio");
+const path = require("path");
+const fs = require("fs")
+const xlsx = require("xlsx");
 
-const url =
-  "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs-chennai-super-kings-final-1370353/full-scorecard";
+const url = "https://www.espncricinfo.com/series/indian-premier-league-2023-1345038/gujarat-titans-vs-chennai-super-kings-final-1370353/full-scorecard";
+
 
 function processURL(url) {
   request(url, cb);
@@ -59,9 +62,45 @@ function extractMatchDetails(html) {
         console.log(
           `${PlayerName} made runs ${runs}, ${balls}  in balls with ${fours} fours and ${sixes} sixes with strike-rate of ${strike_rate}`
         );
+        // processplayer(TeamName, PlayerName, runs, balls, fours, sixes, strike_rate, OpponentName, Venue, Date, result)
       }
     }
   }
+}
+
+function processplayer(TeamName, PlayerName, runs, balls, fours, sixes, strike_rate, OpponentName, Venue, Date, result) {
+  let teamPath = path.join(__dirname, "ipl", TeamName);
+  dirMaker(teamPath);
+  let filepath = path.join(teamPath, PlayerName + ".xlsx");
+  let content = excelReader(filepath, PlayerName);
+  let playerobj = {
+    TeamName, PlayerName, runs, balls, fours, sixes, strike_rate, OpponentName, Venue, Date, result
+  }
+  content.push(playerobj);
+  excelWriter(filepath, content, PlayerName)
+}
+
+function dirMaker(filepath) {
+  if (fs.existsSync(filepath) == false) {
+    fs.mkdirSync(filepath);
+  }
+}
+
+function excelWriter(filepath, json, sheetName) {
+  let newWb = xlsx.utils.book_new();
+  let newWS = xlsx.utils.json_to_sheet(json);
+  xlsx.utils.book_append_sheet(newWb, newWS, sheetName);
+  xlsx.writeFile(newWb, filepath)
+}
+
+function excelReader(filepath, sheetName) {
+  if (fs.existsSync(filepath) == false) {
+    return [];
+  }
+  let WB = xlsx.readFile(filepath);
+  let exceldata = WB.Sheets[sheetName];
+  let ans = xlsx.utils.sheet_to_json(exceldata);
+  return ans;
 }
 
 module.exports = {
